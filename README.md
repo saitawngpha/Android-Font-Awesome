@@ -16,7 +16,7 @@ Include the `fontawesome` dependency in app's **build.gradle** and you are good 
 ```gradle
 dependencies {
     // font awesome library
-    implementation 'info.androidhive:fontawesome:0.0.5'
+    implementation 'com.github.saitawngpha:Android-Font-Awesome:0.0.5'
 }
 ```
 
@@ -118,7 +118,8 @@ public class MainActivity extends AppCompatActivity
 }
 ```
 
-![Demo](https://www.androidhive.info/wp-content/uploads/2019/03/android-font-awesome-navigation-drawer.png)
+## Special thanks to
+![Ravi Tamada](https://github.com/ravi8x/Android-Font-Awesome)
 
 Note:
 -----
