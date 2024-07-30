@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
 def packageName = 'info.androidhive'
@@ -15,64 +14,31 @@ tasks.withType(org.gradle.api.tasks.javadoc.Javadoc) {
 publishing {
     publications {
         aar(MavenPublication) {
-            groupId packageName
+            groupId = packageName
+            artifactId = project.name
             version = libraryVersion
-            artifactId project.getName()
 
-            pom.withXml {
-                def dependencies = asNode().appendNode('dependencies')
-                configurations.getByName("releaseCompileClasspath").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
-                    def dependency = dependencies.appendNode('dependency')
-                    dependency.appendNode('groupId', it.moduleGroup)
-                    dependency.appendNode('artifactId', it.moduleName)
-                    dependency.appendNode('version', it.moduleVersion)
-                }
-            }
+            // Use the AAR artifact
+            artifact("$buildDir/outputs/aar/${project.name}-release.aar")
 
-            task androidJavadocs(type: Javadoc) {
-                failOnError false
-                source = android.sourceSets.main.java.srcDirs
-                // encoding = 'UTF-8'
-                classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-            }
-
-            task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-                classifier = 'javadoc'
-                // encoding = 'UTF-8'
-                from androidJavadocs.destinationDir
-            }
-
+            // Source JAR
             task androidSourcesJar(type: Jar) {
                 classifier = 'sources'
                 from android.sourceSets.main.java.sourceFiles
             }
-
-            artifacts {
-                archives androidSourcesJar
-                archives androidJavadocsJar
-            }
-
-            // Tell maven to prepare the generated "*.aar" file for publishing
-            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
-            artifact androidJavadocsJar
             artifact androidSourcesJar
-        }
-    }
-}
 
-artifactory {
-    contextUrl = 'http://localhost:8081/artifactory'
-    publish {
-        repository {
-            repoKey = 'androidhive-maven'
-            username = artifactory_username
-            password = artifactory_password
-        }
-        defaults {
-            publications('aar')
-            publishArtifacts = true
-            properties = ['qa.level': 'basic', 'dev.team': 'core']
-            publishPom = true
+            // Javadoc JAR
+            task androidJavadocs(type: Javadoc) {
+                failOnError false
+                source = android.sourceSets.main.java.srcDirs
+                classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+            }
+            task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+                classifier = 'javadoc'
+                from androidJavadocs.destinationDir
+            }
+            artifact androidJavadocsJar
         }
     }
 }
@@ -86,7 +52,6 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -104,14 +69,13 @@ android {
         exclude 'META-INF/license'
         exclude 'META-INF/license.txt'
     }
-
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+
