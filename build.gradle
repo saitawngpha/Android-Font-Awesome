@@ -3,7 +3,8 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        mavenLocal()
         
     }
     dependencies {
@@ -18,7 +19,8 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        mavenLocal()
 
         // enable this to load the artifactory from localhost
         // maven { url "http://localhost:8081/artifactory/androidhive-maven" }
